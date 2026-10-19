@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f6f4ee">
+  <meta name="description" content="A shared, real-time tandem driveway tracker for two roommates.">
+  <title>Tandem · Our Driveway</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%23262d29'/%3E%3Crect x='22' y='9' width='20' height='46' rx='7' fill='%23e3b95a'/%3E%3Crect x='25' y='15' width='14' height='12' rx='3' fill='%23262d29'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+  <script src="config.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <div class="site-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 40 40" fill="none"><rect x="12" y="3" width="16" height="34" rx="6" stroke="currentColor" stroke-width="2.3"/><path d="M15 13h10M15 27h10" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/></svg>
+        </div>
+        <span>tandem<span class="brand-dot">.</span></span>
+      </div>
+      <div class="topbar-right">
+        <div id="connectionPill" class="connection-pill demo"><span class="status-dot"></span><span id="connectionText">Demo mode</span></div>
+        <button class="icon-button" id="settingsButton" title="Edit people and cars" aria-label="Edit people and cars">
+          <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/><path d="M19.4 15a2 2 0 0 0 .4 2.2l-1.9 1.9a2 2 0 0 0-2.2-.4 2 2 0 0 0-1.2 1.8h-2.7a2 2 0 0 0-1.2-1.8 2 2 0 0 0-2.2.4l-1.9-1.9A2 2 0 0 0 7 15a2 2 0 0 0-1.8-1.2v-2.7A2 2 0 0 0 7 9.9a2 2 0 0 0-.4-2.2l1.9-1.9a2 2 0 0 0 2.2.4 2 2 0 0 0 1.2-1.8h2.7a2 2 0 0 0 1.2 1.8 2 2 0 0 0 2.2-.4l1.9 1.9a2 2 0 0 0-.4 2.2 2 2 0 0 0 1.8 1.2v2.7a2 2 0 0 0-1.8 1.2Z" transform="translate(-1.2 -0.4)"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <div class="hero-head">
+        <p class="eyebrow"><span class="tiny-square"></span> OUR DRIVEWAY / LIVE PARKING BOARD</p>
+        <div class="hero-row">
+          <div>
+            <h1>Who's parked <em>where?</em></h1>
+            <p class="subheading">One driveway. Two cars. Zero guessing.</p>
+          </div>
+          <button class="share-button" id="shareButton">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="3" width="12" height="14" rx="2"/><path d="M16 21H6a2 2 0 0 1-2-2V7"/></svg>
+            <span>Copy shared link</span>
+          </button>
+        </div>
+      </div>
+
+      <section id="demoBanner" class="info-banner" role="status">
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+        <div><strong>Preview mode</strong> — updates are saved only in this browser. To share live changes between phones, follow the <a href="README.md" target="_blank" rel="noopener noreferrer">2-person setup guide</a>.</div>
+      </section>
+      <section id="errorBanner" class="error-banner" role="alert" hidden>
+        <strong>Live sync unavailable.</strong> <span id="errorDetail">Check your Firebase settings and connection.</span>
+      </section>
+
+      <div class="dashboard-grid">
+        <section class="driveway-panel" aria-label="Driveway positions">
+          <div class="panel-top"><span>DRIVEWAY VIEW</span><span class="panel-view-marker"><span class="circle-indicator"></span> TOP DOWN</span></div>
+          <div class="parking-map">
+            <div class="garage-label"><span class="garage-symbol">▤</span> GARAGE <span class="garage-subline">HOUSE SIDE</span></div>
+            <div class="lane">
+              <button id="frontSpot" class="parking-spot" data-spot="front" aria-label="Change spot by garage">
+                <div class="spot-index"><span>01</span><span>BY THE GARAGE</span></div>
+                <div class="spot-inner">
+                  <div class="car-illustration" aria-hidden="true">
+                    <svg viewBox="0 0 112 182" fill="none">
+                      <rect class="car-shadow" x="22" y="9" width="68" height="164" rx="26"/>
+                      <rect class="car-body" x="25" y="9" width="62" height="162" rx="24"/>
+                      <rect class="car-windshield" x="34" y="37" width="44" height="27" rx="9"/>
+                      <rect class="car-roof" x="31" y="69" width="50" height="45" rx="12"/>
+                      <path class="car-detail" d="M36 123h40" stroke-width="5" stroke-linecap="round"/>
+                      <rect class="car-light" x="32" y="15" width="13" height="6" rx="3"/><rect class="car-light" x="67" y="15" width="13" height="6" rx="3"/>
+                      <rect class="car-taillight" x="32" y="160" width="13" height="5" rx="2"/><rect class="car-taillight" x="67" y="160" width="13" height="5" rx="2"/>
+                      <rect class="tire" x="17" y="41" width="8" height="31" rx="4"/><rect class="tire" x="87" y="41" width="8" height="31" rx="4"/><rect class="tire" x="17" y="121" width="8" height="29" rx="4"/><rect class="tire" x="87" y="121" width="8" height="29" rx="4"/>
+                    </svg>
+                  </div>
+                  <div class="spot-description"><span class="spot-state" id="frontState">AVAILABLE</span><strong class="driver-name" id="frontName">Empty spot</strong><span class="car-name" id="frontVehicle">Tap to add a car</span></div>
+                  <span class="spot-edit" aria-hidden="true">↗</span>
+                </div>
+              </button>
+              <div class="driveway-spacer" aria-hidden="true"><div class="center-stripe"></div><div class="center-stripe"></div></div>
+              <button id="backSpot" class="parking-spot" data-spot="back" aria-label="Change spot by street">
+                <div class="spot-index"><span>02</span><span>BY THE STREET</span></div>
+                <div class="spot-inner">
+                  <div class="car-illustration" aria-hidden="true">
+                    <svg viewBox="0 0 112 182" fill="none">
+                      <rect class="car-shadow" x="22" y="9" width="68" height="164" rx="26"/>
+                      <rect class="car-body" x="25" y="9" width="62" height="162" rx="24"/>
+                      <rect class="car-windshield" x="34" y="37" width="44" height="27" rx="9"/>
+                      <rect class="car-roof" x="31" y="69" width="50" height="45" rx="12"/>
+                      <path class="car-detail" d="M36 123h40" stroke-width="5" stroke-linecap="round"/>
+                      <rect class="car-light" x="32" y="15" width="13" height="6" rx="3"/><rect class="car-light" x="67" y="15" width="13" height="6" rx="3"/>
+                      <rect class="car-taillight" x="32" y="160" width="13" height="5" rx="2"/><rect class="car-taillight" x="67" y="160" width="13" height="5" rx="2"/>
+                      <rect class="tire" x="17" y="41" width="8" height="31" rx="4"/><rect class="tire" x="87" y="41" width="8" height="31" rx="4"/><rect class="tire" x="17" y="121" width="8" height="29" rx="4"/><rect class="tire" x="87" y="121" width="8" height="29" rx="4"/>
+                    </svg>
+                  </div>
+                  <div class="spot-description"><span class="spot-state" id="backState">AVAILABLE</span><strong class="driver-name" id="backName">Empty spot</strong><span class="car-name" id="backVehicle">Tap to add a car</span></div>
+                  <span class="spot-edit" aria-hidden="true">↗</span>
+                </div>
+              </button>
+            </div>
+            <div class="street-label"><span class="street-dashes"></span><span class="street-word">STREET · EXIT</span><span class="street-dashes"></span></div>
+          </div>
+          <div class="driveway-footnote"><span class="footnote-symbol">↗</span> Tap a parking spot to change who's there.</div>
+        </section>
+
+        <aside class="sidebar">
+          <section class="situation-card">
+            <div class="aside-heading">CURRENT SITUATION <span class="aside-icon" aria-hidden="true">↗</span></div>
+            <div class="situation-icon" id="situationIcon" aria-hidden="true">✓</div>
+            <h2 id="situationTitle">All clear.</h2>
+            <p id="situationDescription">Both parking spots are available.</p>
+            <div class="updated-row"><span class="small-clock">◷</span><span id="lastUpdated">No updates yet</span></div>
+          </section>
+          <section class="actions-card">
+            <div class="aside-heading">QUICK ACTIONS</div>
+            <button class="action-line" id="swapButton">
+              <span class="action-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m5 7 4-4 4 4M9 3v14M19 17l-4 4-4-4M15 21V7"/></svg></span>
+              <span class="action-copy"><strong>Swap positions</strong><small>Exchange the two spots</small></span>
+              <span class="action-arrow">↗</span>
+            </button>
+            <button class="action-line" id="clearButton">
+              <span class="action-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m5 7 1 13h12l1-13M3 7h18M10 7V4h4v3M10 11v5M14 11v5"/></svg></span>
+              <span class="action-copy"><strong>Clear the driveway</strong><small>Mark both spots as empty</small></span>
+              <span class="action-arrow">↗</span>
+            </button>
+            <button class="action-line" id="editButton">
+              <span class="action-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m14 5 5 5M3 21l4.5-1L20 7.5 16.5 4 4 16.5 3 21Z"/></svg></span>
+              <span class="action-copy"><strong>Edit people &amp; cars</strong><small>Update names and vehicles</small></span>
+              <span class="action-arrow">↗</span>
+            </button>
+          </section>
+          <div class="tiny-tip"><span>✳</span><p>When someone parks in a new spot, their old spot is automatically cleared.</p></div>
+        </aside>
+      </div>
+      <footer><span>MADE FOR ROOMMATES, NOT PARKING DRAMA.</span><span>tandem<span class="brand-dot">.</span></span></footer>
+    </main>
+  </div>
+
+  <dialog id="spotDialog" class="app-dialog" aria-labelledby="spotDialogTitle">
+    <div class="dialog-header"><div><p class="dialog-overline">UPDATE POSITION</p><h2 id="spotDialogTitle">Who's parked here?</h2></div><button class="dialog-close" data-close="spotDialog" aria-label="Close">×</button></div>
+    <p class="dialog-caption" id="spotDialogHint">Choose a car for this position.</p>
+    <div class="choices">
+      <button class="choice-button" data-choice="one"><span class="choice-swatch swatch-one"></span><span><strong id="choiceOneName">You</strong><small id="choiceOneVehicle">Your car</small></span><span class="choice-chevron">→</span></button>
+      <button class="choice-button" data-choice="two"><span class="choice-swatch swatch-two"></span><span><strong id="choiceTwoName">Roommate</strong><small id="choiceTwoVehicle">Roommate's car</small></span><span class="choice-chevron">→</span></button>
+      <button class="choice-button" data-choice="none"><span class="choice-swatch swatch-empty">×</span><span><strong>Leave empty</strong><small>No car in this spot</small></span><span class="choice-chevron">→</span></button>
+    </div>
+  </dialog>
+
+  <dialog id="settingsDialog" class="app-dialog" aria-labelledby="settingsDialogTitle">
+    <div class="dialog-header"><div><p class="dialog-overline">SHARED SETTINGS</p><h2 id="settingsDialogTitle">People &amp; cars</h2></div><button class="dialog-close" data-close="settingsDialog" aria-label="Close">×</button></div>
+    <p class="dialog-caption">These names appear on both phones when live sync is enabled.</p>
+    <form id="settingsForm">
+      <div class="person-form"><div class="person-label"><span class="mini-swatch swatch-one"></span> PERSON 01</div><label for="oneNameInput">Name</label><input id="oneNameInput" name="oneName" maxlength="40" required placeholder="Your name"><label for="oneVehicleInput">Car</label><input id="oneVehicleInput" name="oneVehicle" maxlength="45" required placeholder="e.g. Silver Honda Civic"></div>
+      <div class="person-form"><div class="person-label"><span class="mini-swatch swatch-two"></span> PERSON 02</div><label for="twoNameInput">Name</label><input id="twoNameInput" name="twoName" maxlength="40" required placeholder="Roommate name"><label for="twoVehicleInput">Car</label><input id="twoVehicleInput" name="twoVehicle" maxlength="45" required placeholder="e.g. Blue Toyota Camry"></div>
+      <button type="submit" class="save-button">Save shared details <span>→</span></button>
+    </form>
+  </dialog>
+
+  <dialog id="confirmDialog" class="app-dialog confirm-dialog" aria-labelledby="confirmTitle">
+    <div class="dialog-header"><div><p class="dialog-overline">DOUBLE CHECK</p><h2 id="confirmTitle">Clear both spots?</h2></div><button class="dialog-close" data-close="confirmDialog" aria-label="Close">×</button></div>
+    <p class="dialog-caption">This will show both cars as out of the driveway on your shared board.</p>
+    <div class="confirm-actions"><button id="cancelClear" class="secondary-button">Cancel</button><button id="confirmClear" class="danger-button">Clear both</button></div>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

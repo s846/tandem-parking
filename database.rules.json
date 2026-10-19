@@ -1,0 +1,21 @@
+{
+  "rules": {
+    "rooms": {
+      "$roomId": {
+        ".read": "auth != null && $roomId.matches(/^[A-Za-z0-9_-]{22}$/)",
+        ".write": "auth != null && $roomId.matches(/^[A-Za-z0-9_-]{22}$/)",
+        ".validate": "newData.hasChildren(['drivers', 'slots', 'updatedAt']) && newData.child('slots/front').isString() && (newData.child('slots/front').val() === 'none' || newData.child('slots/front').val() === 'one' || newData.child('slots/front').val() === 'two') && newData.child('slots/back').isString() && (newData.child('slots/back').val() === 'none' || newData.child('slots/back').val() === 'one' || newData.child('slots/back').val() === 'two') && (newData.child('slots/front').val() === 'none' || newData.child('slots/front').val() !== newData.child('slots/back').val()) && newData.child('updatedAt').isNumber()",
+        "drivers": {
+          "one": {
+            "name": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 40" },
+            "vehicle": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 45" }
+          },
+          "two": {
+            "name": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 40" },
+            "vehicle": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 45" }
+          }
+        }
+      }
+    }
+  }
+}
